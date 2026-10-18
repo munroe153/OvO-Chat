@@ -919,6 +919,26 @@ body.theme-dark .ovo-history-view {
 	margin: 4px 0 8px;
 }
 
+/* 声明式设置页（1.13+）：把整行改成上下堆叠，容纳自定义清单 */
+.setting-item.ovo-settings-stacked,
+.ovo-settings-stacked {
+	display: block;
+}
+
+.setting-item.ovo-settings-stacked > .setting-item-control,
+.ovo-settings-stacked > .setting-item-control {
+	display: none;
+}
+
+.ovo-settings-stacked-body {
+	margin-top: 6px;
+}
+
+/* 声明式设置页：外部插件缺失提示（纯文字行） */
+.setting-item.ovo-settings-warnrow .setting-item-description {
+	color: var(--color-orange, #e08a3c);
+}
+
 .ovo-toolbar-config-icon {
 	display: inline-flex;
 	align-items: center;
