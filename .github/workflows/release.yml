@@ -1,0 +1,65 @@
+name: Release Obsidian plugin
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify tag matches manifest and versions
+        run: |
+          node -e '
+            const manifest = require("./manifest.json");
+            const versions = require("./versions.json");
+            const tag = process.env.GITHUB_REF_NAME;
+            if (manifest.version !== tag) {
+              console.error(`Tag ${tag} does not match manifest.version ${manifest.version}`);
+              process.exit(1);
+            }
+            if (!versions[tag]) {
+              console.error(`versions.json is missing an entry for ${tag}`);
+              process.exit(1);
+            }
+          '
+
+      - name: Build plugin
+        run: pnpm run build
+
+      - name: Attest build provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            main.js
+            styles.css
+
+      - name: Create draft release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          gh release create "$tag" \
+            --title "$tag" \
+            --draft \
+            main.js manifest.json styles.css

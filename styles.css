@@ -1,0 +1,1474 @@
+/* ============================================================
+   OvO Chat — 样式
+   配色方案（浅色）：
+   - 未激活按钮：字 #0F1115 / 底 #FFFFFF / 轮廓 #E5E5E5
+   - 激活按钮：  字 #3964FE / 底 #EDF3FE / 轮廓 #B7C8FE
+   - 发送按钮底 #EDF3FE；特殊区域底色 #EDF3FE
+   深色主题保持同色相自动适配；为 iPad / 移动端优先优化。
+   Author: munroe153
+   ============================================================ */
+
+/* 变量挂在聊天视图容器（contentEl）与聊天根节点两处，确保生效 */
+.ovo-chat-view,
+.ovo-chat,
+.ovo-settings,
+.ovo-tree-view,
+.ovo-history-view {
+	/* 激活态 */
+	--ovo-accent: #3964fe;
+	--ovo-accent-soft: #edf3fe;
+	--ovo-accent-border: #b7c8fe;
+	--ovo-accent-border-soft: rgba(183, 200, 254, 0.55);
+	--ovo-on-accent: #ffffff;
+	--ovo-danger: #e05555;
+	/* 未激活态 */
+	--ovo-idle-fg: #0f1115;
+	--ovo-idle-bg: #ffffff;
+	--ovo-idle-border: #e5e5e5;
+}
+
+body.theme-dark .ovo-chat-view,
+body.theme-dark .ovo-chat,
+body.theme-dark .ovo-settings,
+body.theme-dark .ovo-tree-view,
+body.theme-dark .ovo-history-view {
+	--ovo-accent: #7c95ff;
+	--ovo-accent-soft: rgba(57, 100, 254, 0.22);
+	--ovo-accent-border: rgba(183, 200, 254, 0.5);
+	--ovo-accent-border-soft: rgba(183, 200, 254, 0.3);
+	--ovo-idle-fg: #e8eaf2;
+	--ovo-idle-bg: rgba(255, 255, 255, 0.05);
+	--ovo-idle-border: rgba(255, 255, 255, 0.16);
+}
+
+/* contentEl 即 Obsidian 的 .view-content，class 直接挂在其上 */
+.ovo-chat-view {
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background: var(--background-primary);
+}
+
+.ovo-chat {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+	min-height: 0;
+	flex: 1;
+	background: var(--background-primary);
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------- 顶栏 ---------------- */
+
+.ovo-topbar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--ovo-idle-border);
+	background: var(--background-primary);
+	flex-shrink: 0;
+}
+
+.ovo-logo {
+	display: flex;
+	align-items: center;
+	color: var(--ovo-accent);
+}
+
+.ovo-title {
+	font-weight: 600;
+	font-size: 14px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 50vw;
+}
+
+.ovo-topbar-spacer {
+	flex: 1;
+}
+
+.ovo-icon-btn {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	padding: 6px;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+	color: var(--ovo-idle-fg);
+}
+
+.ovo-icon-btn .svg-icon {
+	width: 16px;
+	height: 16px;
+}
+
+.ovo-icon-btn:hover {
+	background: var(--ovo-accent-soft);
+	color: var(--ovo-accent);
+}
+
+/* 顶栏按键选中态（临时对话） */
+
+.ovo-icon-btn.is-active {
+	background: var(--ovo-accent-soft);
+	color: var(--ovo-accent);
+}
+
+.ovo-icon-btn.is-active:hover {
+	color: var(--ovo-accent);
+}
+
+/* ---------------- 输入区（顶部） ---------------- */
+
+.ovo-composer {
+	flex-shrink: 0;
+	border-bottom: 1px solid var(--ovo-idle-border);
+	background: var(--background-primary);
+	padding: 8px 12px 10px;
+	z-index: 5;
+}
+
+.ovo-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	overflow-x: auto;
+	scrollbar-width: none;
+	padding-bottom: 2px;
+}
+
+.ovo-toolbar::-webkit-scrollbar {
+	display: none;
+}
+
+/* 未激活按钮：白底 + 灰轮廓 + 深字 */
+
+.ovo-select {
+	appearance: none;
+	-webkit-appearance: none;
+	border: 1px solid var(--ovo-idle-border);
+	background: var(--ovo-idle-bg);
+	border-radius: 999px;
+	padding: 4px 24px 4px 12px;
+	font-size: 12px;
+	color: var(--ovo-idle-fg);
+	max-width: 230px;
+	text-overflow: ellipsis;
+	height: 28px;
+	cursor: pointer;
+	background-image: linear-gradient(45deg, transparent 50%, var(--ovo-idle-fg) 50%),
+		linear-gradient(135deg, var(--ovo-idle-fg) 50%, transparent 50%);
+	background-position: calc(100% - 14px) 55%, calc(100% - 10px) 55%;
+	background-size: 4px 4px;
+	background-repeat: no-repeat;
+}
+
+.ovo-select:hover {
+	border-color: var(--ovo-accent-border);
+	color: var(--ovo-accent);
+}
+
+.ovo-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	border: 1px solid var(--ovo-idle-border);
+	background: var(--ovo-idle-bg);
+	color: var(--ovo-idle-fg);
+	border-radius: 999px;
+	padding: 4px 10px;
+	font-size: 12px;
+	height: 28px;
+	cursor: pointer;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.ovo-chip:hover {
+	border-color: var(--ovo-accent-border);
+	color: var(--ovo-accent);
+}
+
+/* 激活按钮：浅蓝底 + 蓝字 + 蓝轮廓 */
+
+.ovo-chip.is-active {
+	background: var(--ovo-accent-soft);
+	border-color: var(--ovo-accent-border);
+	color: var(--ovo-accent);
+}
+
+.ovo-chip.is-active .ovo-chip-icon {
+	color: var(--ovo-accent);
+}
+
+.ovo-chip-icon {
+	display: flex;
+	align-items: center;
+	color: var(--ovo-idle-fg);
+}
+
+.ovo-chip-icon .svg-icon {
+	width: 13px;
+	height: 13px;
+}
+
+/* 附件预览（发送前） */
+
+.ovo-att-preview {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.ovo-att-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: var(--ovo-idle-bg);
+	border: 1px solid var(--ovo-idle-border);
+	border-radius: 8px;
+	padding: 4px 8px;
+	font-size: 12px;
+	max-width: 220px;
+	cursor: default;
+	color: var(--ovo-idle-fg);
+}
+
+.ovo-att-chip .svg-icon {
+	width: 13px;
+	height: 13px;
+	flex-shrink: 0;
+	color: var(--ovo-accent);
+}
+
+.ovo-att-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ovo-att-img {
+	width: 64px;
+	height: 64px;
+	object-fit: cover;
+	border-radius: 8px;
+}
+
+.ovo-att-img-sm {
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.ovo-att-remove {
+	background: transparent;
+	border: none;
+	padding: 2px;
+	cursor: pointer;
+	color: var(--text-muted);
+}
+
+.ovo-att-remove:hover {
+	color: var(--text-error);
+}
+
+/* 输入行（特殊区域：#EDF3FE 底） */
+
+.ovo-input-row {
+	display: flex;
+	align-items: flex-end;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.ovo-input {
+	flex: 1;
+	resize: none;
+	border: 1px solid var(--ovo-accent-border-soft);
+	border-radius: 14px;
+	background: var(--ovo-accent-soft);
+	padding: 9px 12px;
+	font-size: 14px;
+	line-height: 1.55;
+	min-height: 40px;
+	max-height: 28vh;
+	color: var(--text-normal);
+	font-family: var(--font-interface);
+}
+
+.ovo-input:focus {
+	border-color: var(--ovo-accent);
+	outline: none;
+	box-shadow: 0 0 0 2px var(--ovo-accent-border-soft);
+}
+
+/* 发送按钮：DeepSeek 官网样式 —— 实心蓝圆 + 白色上箭头 */
+
+.ovo-send-btn {
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	min-width: 0;
+	min-height: 0;
+	flex: none;
+	aspect-ratio: 1 / 1;
+	border-radius: 50%;
+	border: none;
+	background: var(--ovo-accent);
+	color: var(--ovo-on-accent);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	flex-shrink: 0;
+	transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.ovo-send-btn:hover {
+	transform: scale(1.06);
+	background: var(--ovo-accent);
+	opacity: 0.92;
+}
+
+.ovo-send-btn.is-stop {
+	background: var(--ovo-danger);
+	color: var(--ovo-on-accent);
+}
+
+.ovo-send-btn .svg-icon {
+	width: 19px;
+	height: 19px;
+	color: var(--ovo-on-accent);
+	stroke-width: 2.5px;
+}
+
+/* ---------------- 消息流 ---------------- */
+
+.ovo-messages-wrap {
+	position: relative;
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.ovo-messages {
+	flex: 1;
+	overflow-y: auto;
+	padding: 18px 12px 28px;
+	overscroll-behavior: contain;
+}
+
+/* 回到底部：与发送按钮同款实心蓝圆 + 白色箭头（强制正圆） */
+
+.ovo-scroll-bottom {
+	position: absolute;
+	right: 18px;
+	bottom: 14px;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	min-width: 0;
+	min-height: 0;
+	flex: none;
+	aspect-ratio: 1 / 1;
+	border-radius: 50%;
+	border: none;
+	background: var(--ovo-accent);
+	color: var(--ovo-on-accent);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	box-shadow: var(--shadow-s);
+	z-index: 10;
+}
+
+.ovo-scroll-bottom:hover {
+	background: var(--ovo-accent);
+	opacity: 0.92;
+}
+
+.ovo-scroll-bottom .svg-icon {
+	width: 16px;
+	height: 16px;
+	color: var(--ovo-on-accent);
+	stroke-width: 2.5px;
+}
+
+.ovo-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 12vh 24px 0;
+	gap: 10px;
+}
+
+.ovo-empty-title {
+	font-size: 22px;
+	font-weight: 700;
+	color: var(--text-normal);
+}
+
+.ovo-empty-tip {
+	font-size: 13px;
+	color: var(--text-muted);
+	white-space: pre-line;
+	line-height: 1.8;
+}
+
+.ovo-msg {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 20px;
+	align-items: flex-start;
+}
+
+.ovo-msg-user {
+	justify-content: flex-end;
+}
+
+.ovo-bubble-side {
+	width: 28px;
+	flex-shrink: 0;
+	display: none;
+}
+
+/* 用户气泡：特殊区域底色 #EDF3FE */
+
+.ovo-bubble {
+	max-width: 88%;
+	background: var(--ovo-accent-soft);
+	border: 1px solid var(--ovo-accent-border-soft);
+	border-radius: 16px;
+	padding: 10px 14px;
+}
+
+.ovo-msg-content {
+	min-width: 0;
+	overflow-wrap: break-word;
+	/* 字号跟随 Obsidian「外观 → 字体大小」（一般笔记正文字号），移动端同样生效 */
+	font-size: var(--font-text-size, 16px);
+	line-height: 1.7;
+}
+
+/* 用户消息列（气泡 + 操作条纵向排布，右对齐） */
+.ovo-user-col {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	max-width: 88%;
+	min-width: 0;
+}
+
+.ovo-user-col .ovo-bubble {
+	max-width: 100%;
+}
+
+/* 消息操作条：悬停浮现（触屏常显） */
+.ovo-msg-actions {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	margin-top: 4px;
+	opacity: 0;
+	transition: opacity 0.12s ease;
+}
+
+.ovo-msg:hover .ovo-msg-actions,
+.ovo-msg-actions:focus-within {
+	opacity: 1;
+}
+
+.ovo-msg-actions-user {
+	justify-content: flex-end;
+}
+
+.ovo-action-btn {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	padding: 4px;
+	border-radius: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	cursor: pointer;
+	color: var(--text-faded);
+}
+
+.ovo-action-btn .svg-icon {
+	width: 14px;
+	height: 14px;
+}
+
+.ovo-action-btn:hover {
+	background: var(--ovo-accent-soft);
+	color: var(--ovo-accent);
+}
+
+/* 多答案切换器计数（‹ n/m ›） */
+.ovo-answer-count {
+	font-size: 11px;
+	color: var(--text-faded);
+	font-variant-numeric: tabular-nums;
+	padding: 0 2px;
+	user-select: none;
+}
+
+/* 编辑问句（气泡内联输入框） */
+.ovo-edit-input {
+	width: 100%;
+	min-height: 60px;
+	font-size: 14px;
+	background: var(--background-primary);
+}
+
+.ovo-edit-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.ovo-edit-cancel,
+.ovo-edit-save {
+	font-size: 12px;
+	padding: 4px 12px;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.ovo-edit-cancel {
+	background: transparent;
+	border: 1px solid var(--ovo-idle-border);
+	color: var(--text-muted);
+}
+
+.ovo-edit-cancel:hover {
+	border-color: var(--ovo-accent-border);
+	color: var(--ovo-accent);
+}
+
+.ovo-edit-save {
+	background: var(--ovo-accent);
+	border: none;
+	color: var(--ovo-on-accent);
+}
+
+.ovo-edit-save:hover {
+	opacity: 0.9;
+}
+
+.ovo-att-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-bottom: 6px;
+}
+
+/* 头像：浅蓝底 + 蓝字 */
+
+.ovo-avatar {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: var(--ovo-accent-soft);
+	border: 1px solid var(--ovo-accent-border);
+	color: var(--ovo-accent);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	font-size: 14px;
+	flex-shrink: 0;
+	margin-top: 2px;
+	user-select: none;
+}
+
+.ovo-msg-body {
+	flex: 1;
+	min-width: 0;
+}
+
+.ovo-msg-meta {
+	margin-top: 6px;
+	font-size: 11px;
+	color: var(--text-faded);
+}
+
+.ovo-msg-error .ovo-msg-content {
+	color: var(--text-error);
+}
+
+.ovo-searching {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	color: var(--ovo-accent);
+	margin-bottom: 8px;
+}
+
+.ovo-searching .svg-icon {
+	width: 13px;
+	height: 13px;
+	animation: ovo-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes ovo-pulse {
+	50% {
+		opacity: 0.35;
+	}
+}
+
+/* 思考过程折叠区（蓝色） */
+
+.ovo-reasoning {
+	border: none;
+	border-left: 2px solid var(--ovo-accent-border);
+	margin: 0 0 10px 2px;
+	background: transparent;
+}
+
+.ovo-reasoning summary {
+	cursor: pointer;
+	padding: 3px 0 3px 12px;
+	font-size: 12px;
+	color: var(--ovo-accent);
+	user-select: none;
+	list-style: none;
+}
+
+.ovo-reasoning summary::-webkit-details-marker {
+	display: none;
+}
+
+.ovo-reasoning summary.is-streaming {
+	background: linear-gradient(90deg, var(--text-faded) 30%, var(--text-normal) 50%, var(--text-faded) 70%);
+	background-size: 200% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	animation: ovo-shimmer 1.6s linear infinite;
+	width: fit-content;
+}
+
+@keyframes ovo-shimmer {
+	from {
+		background-position: 200% 0;
+	}
+	to {
+		background-position: -200% 0;
+	}
+}
+
+.ovo-reasoning-body {
+	color: var(--text-muted);
+	/* 深度思考同样跟随笔记正文字号（保持 ~0.8 倍于正文的层级关系） */
+	font-size: calc(var(--font-text-size, 16px) * 0.8);
+	line-height: 1.65;
+	padding: 2px 0 6px 12px;
+	white-space: pre-wrap;
+	max-height: 260px;
+	overflow-y: auto;
+}
+
+/* 联网来源 */
+
+.ovo-sources {
+	margin-top: 10px;
+}
+
+.ovo-sources-label {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	color: var(--text-muted);
+	margin-bottom: 4px;
+}
+
+.ovo-sources-label .svg-icon {
+	width: 12px;
+	height: 12px;
+}
+
+/* 来源折叠（默认折叠，可在设置「界面」分页改为默认展开） */
+.ovo-sources-details > summary.ovo-sources-label {
+	cursor: pointer;
+	user-select: none;
+	list-style: none;
+}
+
+.ovo-sources-details > summary.ovo-sources-label::-webkit-details-marker {
+	display: none;
+}
+
+.ovo-sources-details > summary.ovo-sources-label::marker {
+	content: "";
+}
+
+.ovo-sources-details > summary.ovo-sources-label::after {
+	content: "▸";
+	margin-left: 2px;
+}
+
+.ovo-sources-details[open] > summary.ovo-sources-label::after {
+	content: "▾";
+}
+
+.ovo-sources-list {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.ovo-sources-list a {
+	font-size: 12px;
+	color: var(--ovo-accent);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* 工具调用轨迹（特殊区域：#EDF3FE 底） */
+
+.ovo-tool-calls {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-bottom: 8px;
+}
+
+.ovo-tool-call {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	font-size: 12px;
+	padding: 4px 10px;
+	border-radius: 8px;
+	border: 1px solid var(--ovo-accent-border);
+	background: var(--ovo-accent-soft);
+	color: var(--ovo-accent);
+	max-width: fit-content;
+}
+
+.ovo-tool-call.is-running .ovo-tool-call-icon .svg-icon {
+	animation: ovo-pulse 1.2s ease-in-out infinite;
+}
+
+.ovo-tool-call.is-error {
+	border-color: var(--text-error);
+	color: var(--text-error);
+	background: transparent;
+}
+
+.ovo-tool-call-icon {
+	display: flex;
+	align-items: center;
+}
+
+.ovo-tool-call-icon .svg-icon {
+	width: 12px;
+	height: 12px;
+}
+
+.ovo-tool-call-name {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 420px;
+}
+
+.ovo-tool-call-detail {
+	width: 100%;
+}
+
+.ovo-tool-call-detail summary {
+	cursor: pointer;
+	font-size: 11px;
+	color: var(--text-muted);
+	user-select: none;
+	list-style: none;
+}
+
+.ovo-tool-call-detail summary:hover {
+	color: var(--ovo-accent);
+}
+
+.ovo-tool-call-body {
+	margin-top: 4px;
+	padding: 6px 8px;
+	font-family: var(--font-monospace);
+	font-size: 11px;
+	line-height: 1.5;
+	color: var(--text-muted);
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	max-height: 180px;
+	overflow-y: auto;
+	background: var(--background-primary);
+	border-radius: 6px;
+}
+
+/* 状态栏 */
+
+.ovo-status {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 4px 12px calc(4px + env(safe-area-inset-bottom, 0px));
+	font-size: 11px;
+	color: var(--text-faded);
+	border-top: 1px solid var(--ovo-idle-border);
+}
+
+.ovo-status-right {
+	text-align: right;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* ---------------- 设置页 ---------------- */
+
+/* 分页标签（参考 Obsidian Editing Toolbar v4.1.4 的顶部横向标签页） */
+.ovo-settings-tabs {
+	display: flex;
+	gap: 2px;
+	border-bottom: 2px solid var(--background-modifier-border);
+	margin-bottom: 24px;
+	padding: 0 8px;
+}
+
+.ovo-settings-tab {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	cursor: pointer;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -2px;
+	color: var(--text-muted);
+}
+
+.ovo-settings-tab:hover {
+	color: var(--text-normal);
+	background-color: var(--background-modifier-hover);
+}
+
+.ovo-settings-tab.is-active {
+	color: var(--ovo-accent);
+	border-bottom-color: var(--ovo-accent);
+}
+
+.ovo-settings-tab .svg-icon {
+	width: 16px;
+	height: 16px;
+}
+
+.ovo-settings-content {
+	padding: 0 8px;
+}
+
+.ovo-settings-input-wide {
+	width: 100%;
+}
+
+.ovo-settings-slider {
+	width: 220px;
+}
+
+.ovo-settings-note {
+	margin: 8px 0 4px;
+	padding: 8px 10px;
+	border-radius: 8px;
+	font-size: 12.5px;
+	line-height: 1.5;
+	color: var(--text-muted);
+	background: var(--background-secondary);
+	border: 1px solid var(--ovo-idle-border);
+}
+
+.ovo-settings-note.is-warn {
+	border-left: 3px solid var(--color-orange, #e08a3c);
+}
+
+/* 工具栏按键配置（设置 → 界面） */
+.ovo-toolbar-config {
+	margin: 4px 0 8px;
+}
+
+.ovo-toolbar-config-icon {
+	display: inline-flex;
+	align-items: center;
+	margin-left: 6px;
+	vertical-align: -2px;
+	color: var(--text-muted);
+}
+
+.ovo-toolbar-config-icon .svg-icon {
+	width: 14px;
+	height: 14px;
+}
+
+/* 绘图类型勾选（设置 → 绘图） */
+.ovo-drawing-list {
+	margin: 4px 0 8px;
+}
+
+/* 窄屏（移动端 / iPad）：仅显示当前标签的文字，避免标签换行 */
+@media screen and (max-width: 1024px) {
+	.ovo-settings-tabs .ovo-settings-tab:not(.is-active) > span {
+		display: none;
+	}
+
+	/* 六个一级标签：收紧内边距，避免 320–360px 宽度溢出 */
+	.ovo-settings-tab {
+		padding: 8px;
+	}
+}
+
+.ovo-settings-heading {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 28px 0 12px;
+	padding-bottom: 6px;
+	border-bottom: 1px solid var(--ovo-idle-border);
+	color: var(--ovo-accent);
+}
+
+.ovo-settings-heading:first-child {
+	margin-top: 8px;
+}
+
+.ovo-settings-heading-text {
+	font-weight: 600;
+	font-size: 14px;
+}
+
+.ovo-settings-heading-icon {
+	display: flex;
+	align-items: center;
+	color: var(--ovo-accent);
+}
+
+/* 三级标题：分节内部的分组（表达程度 / Charts / Mermaid） */
+.ovo-settings-heading.is-sub {
+	margin: 18px 0 8px;
+	padding-bottom: 0;
+	border-bottom: none;
+}
+
+.ovo-settings-heading.is-sub .ovo-settings-heading-text {
+	font-size: 13px;
+}
+
+.ovo-settings-heading.is-sub .ovo-settings-heading-icon .svg-icon {
+	width: 14px;
+	height: 14px;
+}
+
+.ovo-slider-value {
+	min-width: 48px;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+	color: var(--text-muted);
+	font-size: 12px;
+}
+
+.ovo-confirm-text {
+	margin-bottom: 12px;
+	white-space: pre-line;
+}
+
+/* ---------------- 专注时间弹窗 ---------------- */
+
+.ovo-focus-tip {
+	margin: 0 0 10px;
+	color: var(--text-muted);
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.ovo-focus-warn {
+	color: var(--text-warning);
+}
+
+/* ---------------- 侧边栏对话树（OvO） ---------------- */
+/* VSCode Git 树风格：从上往下生长，层级引导线连接父子节点 */
+
+.ovo-tree-view {
+	padding: 6px 4px 12px;
+	overflow-y: auto;
+}
+
+.ovo-tree-head {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 8px 10px;
+	color: var(--text-normal);
+	font-weight: 600;
+	font-size: 13px;
+	border-bottom: 1px solid var(--ovo-idle-border);
+	margin-bottom: 6px;
+}
+
+.ovo-tree-head-icon {
+	display: flex;
+	align-items: center;
+	color: var(--ovo-accent);
+}
+
+.ovo-tree-head-icon .svg-icon {
+	width: 14px;
+	height: 14px;
+}
+
+.ovo-tree-head-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ovo-tree-hint {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	min-height: 160px;
+	padding: 24px;
+	text-align: center;
+	color: var(--text-faded);
+	font-size: 13px;
+	line-height: 1.8;
+	white-space: pre-line;
+}
+
+/* 子级容器：左缩进 + 竖向引导线 */
+.ovo-tree-children {
+	margin-left: 12px;
+	padding-left: 8px;
+	border-left: 1px solid var(--ovo-idle-border);
+}
+
+.ovo-tree-node {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	gap: 4px;
+	padding: 5px 6px;
+	margin: 2px 0;
+	border-radius: 6px;
+	cursor: pointer;
+	color: var(--text-muted);
+	font-size: 14px;
+	line-height: 1.7;
+	user-select: none;
+	transition: background 0.1s ease, color 0.1s ease;
+}
+
+/* 水平肘线：连接引导线与节点首行 */
+.ovo-tree-children > .ovo-tree-node::before {
+	content: "";
+	position: absolute;
+	left: -8px;
+	top: 16px;
+	width: 8px;
+	height: 1px;
+	background: var(--ovo-idle-border);
+}
+
+.ovo-tree-node:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+/* 激活路径整链高亮 */
+.ovo-tree-node.is-active {
+	background: var(--ovo-accent-soft);
+	color: var(--ovo-accent);
+}
+
+/* 游标节点（当前续聊位置）加粗 */
+.ovo-tree-node.is-current {
+	font-weight: 600;
+}
+
+/* 问句摘要：最多三行，超出以上下省略号收敛 */
+.ovo-tree-label {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+}
+
+/* 多答案徽标（×N） */
+.ovo-tree-badge {
+	flex-shrink: 0;
+	margin-top: 2px;
+	font-size: 10px;
+	line-height: 1.4;
+	padding: 0 5px;
+	border-radius: 999px;
+	border: 1px solid var(--ovo-accent-border);
+	color: var(--ovo-accent);
+	background: var(--ovo-accent-soft);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---------------- 历史记录页（独立标签页） ---------------- */
+
+.ovo-history-view {
+	padding: 0;
+	overflow-y: auto;
+	background: var(--background-primary);
+}
+
+.ovo-history {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-width: 920px;
+	min-height: 100%;
+	margin: 0 auto;
+	padding: 16px 16px 40px;
+}
+
+.ovo-history-head {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--text-normal);
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.ovo-history-head-icon {
+	display: flex;
+	align-items: center;
+	color: var(--ovo-accent);
+}
+
+.ovo-history-head-icon .svg-icon {
+	width: 18px;
+	height: 18px;
+}
+
+.ovo-history-count {
+	color: var(--text-faded);
+	font-size: 12px;
+	font-weight: 400;
+	font-variant-numeric: tabular-nums;
+}
+
+.ovo-history-head .ovo-icon-btn {
+	margin-left: auto;
+}
+
+.ovo-history-toolbar,
+.ovo-history-filters {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.ovo-history-search {
+	flex: 1 1 220px;
+	min-width: 0;
+	height: 32px;
+}
+
+.ovo-history-sort {
+	flex: 0 0 auto;
+}
+
+.ovo-history-tags {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.ovo-history-tags-label {
+	color: var(--text-faded);
+	font-size: 12px;
+}
+
+.ovo-history-tag-chip {
+	padding: 2px 10px;
+	border: 1px solid var(--ovo-idle-border);
+	border-radius: 999px;
+	background: var(--ovo-idle-bg);
+	color: var(--text-muted);
+	font-size: 12px;
+	line-height: 1.6;
+	cursor: pointer;
+	box-shadow: none;
+}
+
+.ovo-history-tag-chip:hover {
+	border-color: var(--ovo-accent-border);
+	color: var(--ovo-accent);
+}
+
+.ovo-history-tag-chip.is-active {
+	border-color: var(--ovo-accent-border);
+	background: var(--ovo-accent-soft);
+	color: var(--ovo-accent);
+}
+
+.ovo-history-tag-clear {
+	padding: 0 2px;
+	border: none;
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-faded);
+	font-size: 12px;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.ovo-history-batch {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	padding: 8px 10px;
+	border: 1px solid var(--ovo-idle-border);
+	border-radius: 8px;
+	background: var(--ovo-idle-bg);
+	color: var(--text-muted);
+	font-size: 12.5px;
+}
+
+.ovo-history-batch label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+}
+
+.ovo-history-batch-info {
+	font-variant-numeric: tabular-nums;
+}
+
+.ovo-history-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.ovo-history-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 10px 12px;
+	border: 1px solid var(--ovo-idle-border);
+	border-radius: 10px;
+	background: var(--ovo-idle-bg);
+	transition: border-color 0.1s ease, background 0.1s ease;
+}
+
+.ovo-history-item:hover {
+	border-color: var(--ovo-accent-border);
+}
+
+.ovo-history-item.is-selected {
+	border-color: var(--ovo-accent);
+	background: var(--ovo-accent-soft);
+}
+
+.ovo-history-check {
+	flex: none;
+	margin-top: 3px;
+}
+
+.ovo-history-item-main {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+	cursor: pointer;
+}
+
+.ovo-history-item-title {
+	overflow: hidden;
+	color: var(--text-normal);
+	font-size: 14px;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ovo-history-item-meta {
+	color: var(--text-faded);
+	font-size: 11.5px;
+	font-variant-numeric: tabular-nums;
+}
+
+.ovo-history-item-tags {
+	display: flex;
+	gap: 4px;
+	flex-wrap: wrap;
+}
+
+.ovo-history-tag {
+	padding: 1px 8px;
+	border: 1px solid var(--ovo-accent-border-soft);
+	border-radius: 999px;
+	background: var(--ovo-accent-soft);
+	color: var(--ovo-accent);
+	font-size: 11px;
+	line-height: 1.6;
+}
+
+.ovo-history-tag.is-empty {
+	border-color: var(--ovo-idle-border);
+	background: transparent;
+	color: var(--text-faded);
+}
+
+.ovo-history-item-actions {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	flex: none;
+}
+
+.ovo-history-empty {
+	padding: 48px 16px;
+	color: var(--text-faded);
+	font-size: 13px;
+	line-height: 1.8;
+	text-align: center;
+	white-space: pre-line;
+}
+
+.ovo-modal-input {
+	width: 100%;
+	margin: 10px 0 14px;
+}
+
+/* ---------------- iPad / 移动端优先适配 ---------------- */
+
+@media (pointer: coarse) {
+	/* 更大的触控目标 */
+	.ovo-send-btn {
+		width: 42px;
+		height: 42px;
+	}
+
+	.ovo-chip {
+		height: 36px;
+		padding: 6px 14px;
+		font-size: 13px;
+	}
+
+	.ovo-select {
+		height: 36px;
+		max-width: 180px;
+	}
+
+	.ovo-icon-btn {
+		width: 40px;
+		height: 40px;
+	}
+
+	/* iOS：输入框字号 ≥16px 阻止聚焦自动放大 */
+	.ovo-input {
+		font-size: 16px;
+		min-height: 46px;
+	}
+
+	.ovo-msg {
+		gap: 8px;
+	}
+
+	.ovo-bubble {
+		max-width: 94%;
+	}
+
+	.ovo-user-col {
+		max-width: 94%;
+	}
+
+	/* 触屏设备操作条常显（无悬停态） */
+	.ovo-msg-actions {
+		opacity: 1;
+	}
+
+	/* 树节点更大的触控目标 */
+	.ovo-tree-node {
+		padding: 6px 8px;
+	}
+}
+
+@media (max-width: 600px) {
+	.ovo-toolbar {
+		flex-wrap: nowrap;
+	}
+
+	.ovo-select {
+		max-width: 132px;
+	}
+
+	.ovo-title {
+		max-width: 36vw;
+	}
+
+	.ovo-messages {
+		padding: 14px 8px 24px;
+	}
+
+	.ovo-history {
+		padding: 12px 10px 32px;
+	}
+
+	.ovo-history-item {
+		padding: 8px 10px;
+	}
+}
+
+/* 平板 / 桌面宽屏：限宽居中，贴近 DeepSeek 网页版阅读体验 */
+@media (min-width: 900px) {
+	.ovo-messages > * {
+		max-width: 820px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.ovo-composer,
+	.ovo-topbar,
+	.ovo-status {
+		padding-left: max(12px, calc((100% - 820px) / 2));
+		padding-right: max(12px, calc((100% - 820px) / 2));
+	}
+}

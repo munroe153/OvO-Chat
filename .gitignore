@@ -1,0 +1,21 @@
+# 依赖
+node_modules/
+
+# 构建产物（esbuild 生成，不入库）
+main.js
+main.js.map
+
+# 打包产物
+*.zip
+
+# 系统文件
+.DS_Store
+
+# 插件本地数据（含密钥选择等，不入库）
+data.json
+
+# CodeBuddy 本地项目数据
+.codebuddy/
+
+# 本地测试库
+人工测试仓库/
