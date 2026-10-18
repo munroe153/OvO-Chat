@@ -1,6 +1,6 @@
 {
   "name": "ovo-chat",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Mobile-friendly DeepSeek chat with branching conversations, web search, read-only vault tools, and chart rendering.",
   "main": "main.js",
   "scripts": {
@@ -31,7 +31,6 @@
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@types/node": "^22.10.0",
-    "builtin-modules": "^4.0.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.39.4",
     "eslint-plugin-obsidianmd": "^0.4.2",

@@ -16,8 +16,9 @@
  */
 
 import { App, Notice, PluginSettingTab, SecretComponent, Setting, setIcon } from "obsidian";
+import type { SettingDefinitionItem } from "obsidian";
 import type { OVOChatPlugin } from "./main";
-import type { ThinkingEffort } from "./types";
+import type { OVOSettings, ThinkingEffort } from "./types";
 import { toolbarButtonMeta } from "./toolbar";
 import { CHART_TYPES, MERMAID_TYPES, DRAWING_TYPE_IDS, isChartsEnabled, type OVODrawingType } from "./drawing";
 import {
@@ -54,6 +55,185 @@ export class OVOSettingTab extends PluginSettingTab {
 
 	constructor(app: App, private plugin: OVOChatPlugin) {
 		super(app, plugin);
+	}
+
+	/**
+	 * 声明式设置定义（Obsidian 1.13+）：供「设置搜索」索引使用。
+	 *
+	 * 界面渲染仍由下面的 display() 分页实现负责——分页布局在移动端更紧凑，
+	 * 且 1.11 / 1.12 上也能正常工作；声明只描述每个设置的名称、说明与控件类型，
+	 * 使 1.13+ 的设置搜索能检索到这些设置项。
+	 */
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		const s = this.plugin.settings;
+		const models = this.plugin.getModelsSync();
+		const modelOptions: Record<string, string> = {};
+		for (const m of models) modelOptions[m.id] = m.label;
+		if (!models.some((m) => m.id === s.defaultModel)) {
+			modelOptions[s.defaultModel] = s.defaultModel;
+		}
+
+		return [
+			{
+				type: "page",
+				name: "密钥",
+				desc: "DeepSeek API 密钥与连通性测试",
+				items: [
+					{
+						name: "API 密钥",
+						desc: "从 Obsidian 内置密钥库选择或新建；密钥值由 Obsidian 管理，不写入插件配置。",
+						aliases: ["api key", "deepseek key", "secret"],
+					},
+					{
+						name: "测试连接",
+						desc: "验证密钥与网络，并刷新模型列表。",
+						aliases: ["test connection", "连通性"],
+					},
+				],
+			},
+			{
+				type: "page",
+				name: "界面",
+				desc: "消息显示与工具栏按键",
+				items: [
+					this.toggleDef("collapseReasoning", "思考内容默认折叠", "默认折叠为一行摘要，点击展开。"),
+					this.toggleDef("collapseSources", "搜索来源默认折叠", "默认折叠来源链接，点击展开。"),
+					{
+						name: "工具栏按键",
+						desc: "控制对话窗口工具栏按键的显示与排列顺序。",
+						aliases: ["toolbar", "按键排序"],
+					},
+				],
+			},
+			{
+				type: "page",
+				name: "调参",
+				desc: "模型、思考强度与生成参数",
+				items: [
+					{
+						name: "默认模型",
+						desc: "列表由官方 API 动态拉取；对话窗口内可随时切换。",
+						control: { type: "dropdown", key: "defaultModel", options: modelOptions },
+					},
+					this.dropdownDef("defaultEffort", "默认思考强度", "对话窗口可随时调节。", {
+						off: "关闭（禁用思考模式）",
+						low: "低（low）",
+						medium: "中（medium）",
+						high: "高（high）",
+						max: "极大（max）",
+					}),
+					this.textareaDef("systemPrompt", "系统提示词（system prompt）", "每轮注入；留空不发送。"),
+					this.toggleDef("injectTodayDate", "注入当日日期", "注入当日日期（本地时区）；临时对话同样注入。"),
+					this.sliderDef("temperature", "temperature（温度）", "0 – 2，越高越有创造性；思考模式下无效。", 0, 2, 0.05),
+					this.sliderDef("topP", "top_p（核采样）", "0 – 1；思考模式下仅 0.95–1.0 生效。", 0, 1, 0.01),
+					this.numberDef("maxTokens", "最大输出（max_tokens）", "单次回复最大输出 token 数（注意费用）。", 1),
+					this.textareaDef("stopSequences", "停止序列（stop_sequences）", "每行一个；留空不启用。"),
+					this.numberDef("contextMessages", "上下文长度（历史消息条数）", "携带的最近消息条数；0 = 全部历史。", 0),
+					this.numberDef("contextTokenBudget", "上下文 token 预算（估算）", "按估算 token 从最新向前保留；0 = 不限制。", 0),
+				],
+			},
+			{
+				type: "page",
+				name: "工具",
+				desc: "联网搜索与只读仓库工具",
+				items: [
+					this.toggleDef("defaultWebSearch", "新对话默认开启联网搜索", "新对话初值；对话窗口可随时切换。"),
+					this.toggleDef("defaultToolMode", "新对话默认开启工具调用", "新对话初值；对话窗口可随时切换。"),
+					this.numberDef(
+						"toolReadMaxChars",
+						"读取范围（字符上限）",
+						"内置工具单次读取上限（read_note / get_active_note，1000–200000 字符）。",
+						1000,
+						200000,
+						1000
+					),
+				],
+			},
+			{
+				type: "page",
+				name: "提示词",
+				desc: "个性化、数学 / 化学 / 绘图增强",
+				items: [
+					this.toggleDef("personalizeEnabled", "个性化", "总开关关闭后不注入任何风格 / 排版提示词。"),
+					this.choiceDef("tone", "基本风格和语调", TONE_CHOICES),
+					this.choiceDef("warmth", "亲切程度", WARMTH_CHOICES),
+					this.choiceDef("enthusiasm", "热情程度", ENTHUSIASM_CHOICES),
+					this.choiceDef("emojiLevel", "表情符号", EMOJI_CHOICES),
+					this.choiceDef("layoutStyle", "布局和视觉元素", LAYOUT_CHOICES),
+					this.toggleDef("syntaxMathJax", "数学增强（MathJax）", "注入 $…$ / $$…$$ 数学语法要求。"),
+					this.toggleDef("syntaxMhchem", "化学增强（mhchem）", "注入 \\ce{} 化学语法要求。"),
+					this.toggleDef("syntaxChem", "化学增强（smiles 代码块）", "注入 ```smiles 代码块要求，需 Chem 插件渲染。"),
+					{
+						name: "绘图增强",
+						desc: "只注入已勾选类型的提示词；是否启用由工具栏「绘图」按键控制。",
+						aliases: ["charts", "mermaid", "chart", "图表"],
+					},
+				],
+			},
+			{
+				type: "page",
+				name: "高级",
+				desc: "Obsidian 语法修正与键盘发送规则",
+				items: [
+					this.toggleDef("syntaxTableSpacing", "表格前后留空", "渲染前修正表格前后空行。"),
+					this.toggleDef("syntaxHighlight", "==高亮== 归一化", "渲染前统一 ==高亮== 语法。"),
+					{
+						name: "发送键方案",
+						desc: "Enter 发送 / Shift+Enter 换行，或相反；Ctrl/Cmd+Enter 始终发送。",
+						aliases: ["keyboard", "enter to send"],
+					},
+				],
+			},
+		];
+	}
+
+	private toggleDef(key: keyof OVOSettings, name: string, desc: string): SettingDefinitionItem {
+		return { name, desc, control: { type: "toggle", key } };
+	}
+
+	private dropdownDef(
+		key: keyof OVOSettings,
+		name: string,
+		desc: string,
+		options: Record<string, string>
+	): SettingDefinitionItem {
+		return { name, desc, control: { type: "dropdown", key, options } };
+	}
+
+	private textareaDef(key: keyof OVOSettings, name: string, desc: string): SettingDefinitionItem {
+		return { name, desc, control: { type: "textarea", key } };
+	}
+
+	private numberDef(
+		key: keyof OVOSettings,
+		name: string,
+		desc: string,
+		min?: number,
+		max?: number,
+		step?: number
+	): SettingDefinitionItem {
+		return { name, desc, control: { type: "number", key, min, max, step } };
+	}
+
+	private sliderDef(
+		key: keyof OVOSettings,
+		name: string,
+		desc: string,
+		min: number,
+		max: number,
+		step: number
+	): SettingDefinitionItem {
+		return { name, desc, control: { type: "slider", key, min, max, step } };
+	}
+
+	private choiceDef<T extends string>(
+		key: keyof OVOSettings,
+		name: string,
+		choices: OVOChoice<T>[]
+	): SettingDefinitionItem {
+		const options: Record<string, string> = {};
+		for (const c of choices) options[c.id] = c.name;
+		return { name, desc: choices[0]?.desc ?? "", control: { type: "dropdown", key, options } };
 	}
 
 	display(): void {
