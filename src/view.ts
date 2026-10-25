@@ -267,9 +267,11 @@ export class OVOChatView extends ItemView {
 			}
 		});
 
-		this.sendBtn = inputRow.createEl("button", { cls: "ovo-send-btn" });
-		this.sendBtn.setAttribute("aria-label", "发送");
-		setIcon(this.sendBtn, "arrow-up");
+		this.sendBtn = inputRow.createEl("button", {
+			cls: "ovo-send-btn",
+			attr: { type: "button", "aria-label": "发送" },
+		});
+		this.setSendIcon("send");
 		this.sendBtn.addEventListener("click", () => {
 			if (this.streaming) {
 				this.stop();
@@ -999,8 +1001,19 @@ export class OVOChatView extends ItemView {
 		this.streaming = on;
 		this.sendBtn.toggleClass("is-stop", on);
 		this.sendBtn.setAttribute("aria-label", on ? "停止生成" : "发送");
-		this.sendBtn.empty();
-		setIcon(this.sendBtn, on ? "square" : "arrow-up");
+		this.setSendIcon(on ? "stop" : "send");
+	}
+
+	/**
+	 * 发送 / 停止图标：内联 SVG（不依赖 setIcon 与图标库 / 主题 .svg-icon 样式），
+	 * 固定 viewBox + 显式填充色，桌面端与移动端渲染一致。
+	 */
+	private setSendIcon(kind: "send" | "stop"): void {
+		const glyph =
+			kind === "stop"
+				? `<rect x="6.5" y="6.5" width="11" height="11" rx="2.5" fill="#fff"/>`
+				: `<path fill="#fff" d="M12 4.4c.3 0 .58.11.8.33l5.55 5.55a1.13 1.13 0 0 1-1.6 1.6l-3.62-3.62v10.6a1.13 1.13 0 0 1-2.26 0V8.26L7.25 11.88a1.13 1.13 0 1 1-1.6-1.6l5.55-5.55c.22-.22.5-.33.8-.33Z"/>`;
+		this.sendBtn.innerHTML = `<svg class="ovo-send-glyph" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">${glyph}</svg>`;
 	}
 
 	private stop(): void {
