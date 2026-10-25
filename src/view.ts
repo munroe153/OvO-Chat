@@ -405,7 +405,7 @@ export class OVOChatView extends ItemView {
 		return this.drawChip;
 	}
 
-	/** 个性化总开关（全局持久化设置，原设置页内的 Toggle 已移到此处） */
+	/** 个性化总开关（唯一入口；设置页只保留档位） */
 	private buildPersonalizeChip(toolbar: HTMLElement): HTMLElement {
 		this.personalizeChip = toolbar.createEl("button", { cls: "ovo-chip" });
 		this.personalizeChip.setAttribute("aria-label", "个性化（风格 / 表达程度 / 排版提示词注入的总开关）");
@@ -1005,15 +1005,33 @@ export class OVOChatView extends ItemView {
 	}
 
 	/**
-	 * 发送 / 停止图标：内联 SVG（不依赖 setIcon 与图标库 / 主题 .svg-icon 样式），
+	 * 发送 / 停止图标：自绘 SVG（不依赖 setIcon 与图标库 / 主题 .svg-icon 样式），
 	 * 固定 viewBox + 显式填充色，桌面端与移动端渲染一致。
 	 */
 	private setSendIcon(kind: "send" | "stop"): void {
-		const glyph =
-			kind === "stop"
-				? `<rect x="6.5" y="6.5" width="11" height="11" rx="2.5" fill="#fff"/>`
-				: `<path fill="#fff" d="M12 4.4c.3 0 .58.11.8.33l5.55 5.55a1.13 1.13 0 0 1-1.6 1.6l-3.62-3.62v10.6a1.13 1.13 0 0 1-2.26 0V8.26L7.25 11.88a1.13 1.13 0 1 1-1.6-1.6l5.55-5.55c.22-.22.5-.33.8-.33Z"/>`;
-		this.sendBtn.innerHTML = `<svg class="ovo-send-glyph" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">${glyph}</svg>`;
+		this.sendBtn.empty();
+		const svg = this.sendBtn.createSvg("svg", {
+			cls: "ovo-send-glyph",
+			attr: {
+				viewBox: "0 0 24 24",
+				width: 20,
+				height: 20,
+				"aria-hidden": "true",
+				focusable: "false",
+			},
+		});
+		if (kind === "stop") {
+			svg.createSvg("rect", {
+				attr: { x: 6.5, y: 6.5, width: 11, height: 11, rx: 2.5, fill: "#fff" },
+			});
+			return;
+		}
+		svg.createSvg("path", {
+			attr: {
+				fill: "#fff",
+				d: "M12 4.4c.3 0 .58.11.8.33l5.55 5.55a1.13 1.13 0 0 1-1.6 1.6l-3.62-3.62v10.6a1.13 1.13 0 0 1-2.26 0V8.26L7.25 11.88a1.13 1.13 0 1 1-1.6-1.6l5.55-5.55c.22-.22.5-.33.8-.33Z",
+			},
+		});
 	}
 
 	private stop(): void {
