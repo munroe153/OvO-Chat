@@ -13,7 +13,7 @@
  *   transparency, xTitle/yTitle, xMin/xMax/xReverse/xDisplay/xTickDisplay/xTickPadding,
  *   yMin/yMax/yReverse/yDisplay/yTickDisplay/yTickPadding, rMin/rMax, padding, time
  *
- * Mermaid 仅提供稳定成熟的 12 种类型（其余 beta 图表不提供）。
+ * Mermaid 仅提供稳定成熟的 6 种类型（流程图 / 时序图 / 甘特图 / 时间线 / 思维导图 / 看板）。
  *
  * Author: munroe153
  */
@@ -115,7 +115,7 @@ const MERMAID_BASE_PROMPT =
 	"Quote node text that contains special characters (spaces, parentheses, colons, etc.). " +
 	"Edge labels must have balanced quotes: write -->|\"label\"|, never -->|\"label|. Keep the structure concise and the number of nodes moderate.";
 
-/** Mermaid 图表类型（仅稳定成熟的 12 种；beta 图表不提供） */
+/** Mermaid 图表类型（仅稳定成熟的 6 种；beta 图表不提供） */
 export const MERMAID_TYPES: OVODrawingType[] = [
 	{
 		id: "mermaid-flowchart",
@@ -138,33 +138,6 @@ export const MERMAID_TYPES: OVODrawingType[] = [
 			"Example:\n```mermaid\nsequenceDiagram\n  participant U as User\n  participant S as Server\n  U->>S: Send request\n  S-->>U: Return result\n```",
 	},
 	{
-		id: "mermaid-class",
-		name: "类图",
-		desc: "classDiagram：类、属性方法与继承组合关系。",
-		prompt:
-			"[Class diagram] classDiagram. Class definition: class Name { +public -private #protected attribute/method() }. " +
-			"Relationships: A <|-- B (inheritance), A *-- B (composition), A o-- B (aggregation), A --> B (association), A ..> B (dependency); add labels with A --> B : description.\n" +
-			"Example:\n```mermaid\nclassDiagram\n  class Animal {\n    +String name\n    +eat()\n  }\n  class Dog\n  Animal <|-- Dog\n```",
-	},
-	{
-		id: "mermaid-state",
-		name: "状态图",
-		desc: "stateDiagram-v2：状态机与状态转移。",
-		prompt:
-			"[State diagram] stateDiagram-v2. Start [*] --> StateA; end StateB --> [*]. " +
-			"Transitions: StateA --> StateB : event. Composite states: state Name { … }; choice: state <<choice>>.\n" +
-			"Example:\n```mermaid\nstateDiagram-v2\n  [*] --> Pending\n  Pending --> Processing : start\n  Processing --> [*] : done\n```",
-	},
-	{
-		id: "mermaid-er",
-		name: "实体关系图",
-		desc: "erDiagram：数据库实体、属性与关系基数。",
-		prompt:
-			"[Entity relationship diagram] erDiagram. Entity definition: Entity { type attribute } (types such as string / int / date). " +
-			"Relationships: EntityA ||--o{ EntityB : label (|| exactly one, o{ zero or more, |{ one or more); attributes can be marked PK / FK with comments such as string id PK \"primary key\".\n" +
-			"Example:\n```mermaid\nerDiagram\n  CUSTOMER ||--o{ ORDER : places\n  CUSTOMER {\n    string id PK\n    string name\n  }\n```",
-	},
-	{
 		id: "mermaid-gantt",
 		name: "甘特图",
 		desc: "gantt：项目排期与任务进度。",
@@ -173,25 +146,6 @@ export const MERMAID_TYPES: OVODrawingType[] = [
 			"Tasks: Task name : status, id, start date, duration (e.g., 5d) or start, end date; status tags done / active / crit; chain tasks with after id.\n" +
 			"Note: dates must be real values; do not invent them.\n" +
 			"Example:\n```mermaid\ngantt\n  title Project plan\n  dateFormat YYYY-MM-DD\n  section Phase 1\n  Research :done, a1, 2026-01-01, 5d\n  Implementation :active, a2, after a1, 10d\n```",
-	},
-	{
-		id: "mermaid-gitgraph",
-		name: "Git 图",
-		desc: "gitGraph：分支、提交与合并历史。",
-		prompt:
-			"[Git graph] gitGraph. Commit: commit (optionally with id / tag, e.g., commit id: \"init\"). " +
-			"Branch: branch name. Switch: checkout branch. Merge: merge branch.\n" +
-			"Example:\n```mermaid\ngitGraph\n  commit id: \"init\"\n  branch dev\n  commit id: \"feature\"\n  checkout main\n  merge dev\n```",
-	},
-	{
-		id: "mermaid-c4",
-		name: "C4 上下文图",
-		desc: "C4Context：系统上下文与外部依赖关系。",
-		prompt:
-			"[C4 context diagram] C4Context. Elements: Person(alias, \"Name\", \"Description\"), System(alias, \"Name\", \"Description\"), " +
-			"System_Ext(alias, \"Name\", \"Description\") for external systems. Relationships: Rel(source, target, \"Description\"). " +
-			"Enterprise boundary: Enterprise_Boundary(alias, \"Name\") { … }.\n" +
-			"Example:\n```mermaid\nC4Context\n  Person(user, \"User\", \"Product user\")\n  System(app, \"Business system\", \"Core system\")\n  System_Ext(mail, \"Email service\", \"Third-party service\")\n  Rel(user, app, \"Uses\")\n  Rel(app, mail, \"Sends notifications\")\n```",
 	},
 	{
 		id: "mermaid-timeline",
@@ -209,15 +163,6 @@ export const MERMAID_TYPES: OVODrawingType[] = [
 			"[Mind map] mindmap. Root node: root((Central topic)). Indent child nodes level by level (two spaces per level). " +
 			"Node text can be plain, or specify a shape with id[text] / (text) / ((text)).\n" +
 			"Example:\n```mermaid\nmindmap\n  root((Product plan))\n    Features\n      Login\n      Search\n    Experience\n      Performance\n```",
-	},
-	{
-		id: "mermaid-journey",
-		name: "用户旅程图",
-		desc: "journey：用户完成任务的阶段与体验评分。",
-		prompt:
-			"[User journey] journey. Title: title. Sections: section Name. " +
-			"Each line: Task name: score: actor: task description (score 1–5).\n" +
-			"Example:\n```mermaid\njourney\n  title Shopping journey\n  section Browse\n    Browse products: 5: User\n    Add to cart: 3: User\n  section Checkout\n    Pay order: 4: User\n```",
 	},
 	{
 		id: "mermaid-kanban",
