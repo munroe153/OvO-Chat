@@ -3,7 +3,7 @@
 	"name": "OvO Chat",
 	"version": "0.1.3",
 	"minAppVersion": "1.11.4",
-	"description": "Custom conversation plugin based on deepseek API",
+	"description": "Custom conversation plugin based on deepseek API.",
 	"author": "munroe153",
 	"authorUrl": "https://github.com/munroe153",
 	"isDesktopOnly": false
