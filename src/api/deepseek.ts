@@ -86,6 +86,7 @@ interface CommonOptions {
 	effort: ThinkingEffort;
 	temperature?: number;
 	topP?: number;
+	/** 单次回复最大输出 token 数；0 / 未设置 = 不限制（不发送 max_tokens） */
 	maxTokens?: number;
 	/** 停止序列（Anthropic：stop_sequences） */
 	stop?: string[];
@@ -206,8 +207,11 @@ export class DeepSeekClient {
 			model: opts.model,
 			messages,
 			stream: true,
-			max_tokens: opts.maxTokens ?? 8192,
 		};
+		// max_tokens：0 / 未设置 = 不限制（不发送该字段，交由服务端决定）
+		if (opts.maxTokens != null && Number.isFinite(opts.maxTokens) && opts.maxTokens > 0) {
+			body.max_tokens = opts.maxTokens;
+		}
 		if (opts.system && opts.system.trim()) body.system = opts.system.trim();
 		// 思考强度：off → 显式关闭；其余 → 开启思考并设置 effort（medium 映射为 high）
 		if (opts.effort === "off") {

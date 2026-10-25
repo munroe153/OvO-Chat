@@ -234,11 +234,11 @@ export class OVOSettingTab extends PluginSettingTab {
 						this.numberDef(
 							"maxTokens",
 							"最大输出（max_tokens）",
-							"单次回复最大输出 token 数（注意费用）。",
-							1,
+							"单次回复最大输出 token 数；0 = 不限制（交由服务端决定，注意费用）。",
+							0,
 							undefined,
 							1,
-							(v) => (Number.isFinite(v) && v >= 1 ? undefined : "需为 ≥ 1 的整数")
+							(v) => (Number.isFinite(v) && v >= 0 ? undefined : "需为 ≥ 0 的整数（0 = 不限制）")
 						),
 						this.textareaDef("stopSequences", "停止序列（stop_sequences）", "每行一个；留空不启用。", 2),
 					],
@@ -459,7 +459,7 @@ export class OVOSettingTab extends PluginSettingTab {
 		} else if (key === "topP") {
 			s.topP = clampNumber(value, 0, 1, s.topP);
 		} else if (key === "maxTokens") {
-			s.maxTokens = clampInt(value, 1, Number.MAX_SAFE_INTEGER, s.maxTokens);
+			s.maxTokens = clampInt(value, 0, Number.MAX_SAFE_INTEGER, s.maxTokens);
 		} else if (key === "contextMessages") {
 			s.contextMessages = clampInt(value, 0, Number.MAX_SAFE_INTEGER, s.contextMessages);
 		} else if (key === "contextTokenBudget") {
@@ -829,11 +829,11 @@ export class OVOSettingTab extends PluginSettingTab {
 
 		new Setting(el)
 			.setName("最大输出（max_tokens）")
-			.setDesc("单次回复最大输出 token 数（注意费用）。")
+			.setDesc("单次回复最大输出 token 数；0 = 不限制（交由服务端决定，注意费用）。")
 			.addText((t) =>
 				t.setValue(String(s.maxTokens)).onChange(async (v) => {
 					const n = parseInt(v, 10);
-					if (!Number.isNaN(n) && n > 0) {
+					if (!Number.isNaN(n) && n >= 0) {
 						s.maxTokens = n;
 						await this.plugin.saveSettings();
 					}

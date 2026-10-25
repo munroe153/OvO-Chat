@@ -203,7 +203,7 @@ export interface OVOSettings {
 	temperature: number;
 	/** 核采样：0 – 1（思考模式下官方仅在 0.95–1.0 生效） */
 	topP: number;
-	/** 单次回复最大输出 token 数 */
+	/** 单次回复最大输出 token 数；0 = 不限制（请求不发送 max_tokens，交由服务端决定） */
 	maxTokens: number;
 	/** 每行一个停止序列；空 = 不启用 */
 	stopSequences: string;
