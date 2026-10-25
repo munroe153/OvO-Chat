@@ -1,5 +1,7 @@
 # OvO Chat
 
+> 中文文档在本文档后半部分
+
 Mobile-friendly DeepSeek chat for Obsidian with branching conversations, history, web search, read-only vault tools, and chart rendering.
 
 OvO Chat keeps every conversation as a question → answer tree. You can regenerate an answer, edit a sent question, or continue from any node without losing the other branches. All data stays inside the plugin's own data directory.
