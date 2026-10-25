@@ -3,7 +3,7 @@
 	"name": "OvO Chat",
 	"version": "0.1.2",
 	"minAppVersion": "1.11.4",
-	"description": "Mobile-friendly DeepSeek chat with branching conversations, web search, read-only vault tools, and chart rendering.",
+	"description": "Custom conversation plugin based on deepseek API",
 	"author": "munroe153",
 	"authorUrl": "https://github.com/munroe153",
 	"isDesktopOnly": false

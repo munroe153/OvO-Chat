@@ -1,7 +1,7 @@
 {
   "name": "ovo-chat",
   "version": "0.1.2",
-  "description": "Mobile-friendly DeepSeek chat with branching conversations, web search, read-only vault tools, and chart rendering.",
+  "description": "Custom conversation plugin based on deepseek API",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
