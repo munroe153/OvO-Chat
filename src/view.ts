@@ -123,7 +123,6 @@ export class OVOChatView extends ItemView {
 	private toolChip!: HTMLButtonElement;
 	private drawChip!: HTMLButtonElement;
 	private personalizeChip!: HTMLButtonElement;
-	private scrollBtn!: HTMLButtonElement;
 
 	private mdRenderTimer: number | null = null;
 
@@ -290,18 +289,10 @@ export class OVOChatView extends ItemView {
 		/* ---- 消息流 ---- */
 		this.messagesWrapEl = chat.createDiv("ovo-messages-wrap");
 		this.messagesEl = this.messagesWrapEl.createDiv("ovo-messages");
+		// 用户上翻时暂停自动吸底（不再提供「回到底部」按钮）
 		this.messagesEl.addEventListener("scroll", () => {
 			const el = this.messagesEl;
 			this.autoScroll = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
-			this.scrollBtn.toggle(!this.autoScroll);
-		});
-		this.scrollBtn = this.messagesWrapEl.createEl("button", { cls: "ovo-scroll-bottom" });
-		setIcon(this.scrollBtn, "arrow-down");
-		this.scrollBtn.setAttribute("aria-label", "滚动到底部");
-		this.scrollBtn.hide();
-		this.scrollBtn.addEventListener("click", () => {
-			this.autoScroll = true;
-			this.scrollBottom(true);
 		});
 
 		/* ---- 状态栏 ---- */

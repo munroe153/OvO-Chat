@@ -371,43 +371,6 @@ body.theme-dark .ovo-history-view {
 	overscroll-behavior: contain;
 }
 
-/* 回到底部：与发送按钮同款实心蓝圆 + 白色箭头（强制正圆） */
-
-.ovo-scroll-bottom {
-	position: absolute;
-	right: 18px;
-	bottom: 14px;
-	width: 34px;
-	height: 34px;
-	padding: 0;
-	min-width: 0;
-	min-height: 0;
-	flex: none;
-	aspect-ratio: 1 / 1;
-	border-radius: 50%;
-	border: none;
-	background: var(--ovo-accent);
-	color: var(--ovo-on-accent);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	box-shadow: var(--shadow-s);
-	z-index: 10;
-}
-
-.ovo-scroll-bottom:hover {
-	background: var(--ovo-accent);
-	opacity: 0.92;
-}
-
-.ovo-scroll-bottom .svg-icon {
-	width: 16px;
-	height: 16px;
-	color: var(--ovo-on-accent);
-	stroke-width: 2.5px;
-}
-
 .ovo-empty {
 	display: flex;
 	flex-direction: column;
