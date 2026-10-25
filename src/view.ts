@@ -299,7 +299,6 @@ export class OVOChatView extends ItemView {
 
 		/* ---- 状态栏 ---- */
 		const status = chat.createDiv("ovo-status");
-		status.createSpan({ text: "🔒 DeepSeek 官方接口 · Anthropic 兼容" });
 		this.statusRightEl = status.createSpan("ovo-status-right");
 		this.updateStatus();
 	}
@@ -520,22 +519,15 @@ export class OVOChatView extends ItemView {
 		this.plugin.notifyTreeChanged();
 	}
 
+	/** 空状态：仅临时对话给出必要提示，常规对话不显示任何文案 */
 	private renderEmptyState(): void {
+		if (!this.tempMode) return;
 		const empty = this.messagesEl.createDiv("ovo-empty");
-		if (this.tempMode) {
-			empty.createDiv("ovo-empty-title").setText("临时对话");
-			empty
-				.createDiv("ovo-empty-tip")
-				.setText(
-					"本次对话不会保存（含附件）、不注入个性化与语法增强提示词，退出后即消失\n翻看历史对话 / 新建对话会退出临时对话；点击顶栏「幽灵」按键可主动退出"
-				);
-			return;
-		}
-		empty.createDiv("ovo-empty-title").setText("你好，我是 AI 助手");
+		empty.createDiv("ovo-empty-title").setText("临时对话");
 		empty
 			.createDiv("ovo-empty-tip")
 			.setText(
-				"在上方输入框开始对话 · 可切换模型、调节思考强度、开启联网搜索\n支持上传图片（视觉）与 Markdown / 文本附件，也可直接附加当前笔记\n对话以问答树保存：可编辑提问、重新生成答案、从任意节点继续对话"
+				"本次对话不会保存（含附件）、不注入个性化与语法增强提示词，退出后即消失\n翻看历史对话 / 新建对话会退出临时对话；点击顶栏「幽灵」按键可主动退出"
 			);
 	}
 
