@@ -69,7 +69,6 @@ const BOOLEAN_SETTING_KEYS = new Set<string>([
 	"defaultWebSearch",
 	"collapseReasoning",
 	"collapseSources",
-	"personalizeEnabled",
 	"syntaxMathJax",
 	"syntaxMhchem",
 	"syntaxChem",
@@ -323,12 +322,11 @@ export class OVOSettingTab extends PluginSettingTab {
 					type: "group",
 					heading: "个性化",
 					items: [
-						this.toggleDef(
-							"personalizeEnabled",
-							"启用个性化",
-							"总开关关闭后不注入任何风格 / 排版提示词（各档位选择保留）。",
-							["personalize", "个性化"]
-						),
+						{
+							name: "个性化开关",
+							desc: "总开关在对话输入区工具栏「个性化」按键；关闭后不注入任何风格 / 排版提示词（档位保留）。",
+							aliases: ["personalize", "个性化"],
+						},
 						this.choiceDef("tone", "基本风格和语调", TONE_CHOICES, ["tone", "语气"]),
 						this.choiceDef("warmth", "亲切程度", WARMTH_CHOICES),
 						this.choiceDef("enthusiasm", "热情程度", ENTHUSIASM_CHOICES),
@@ -480,17 +478,13 @@ export class OVOSettingTab extends PluginSettingTab {
 		this.afterControlChange(key);
 	}
 
-	/** 控件写入后的联动：档位说明、个性化禁用态、语法修正重渲 */
+	/** 控件写入后的联动：档位说明、语法修正重渲 */
 	private afterControlChange(key: string): void {
 		const entry = this.choiceDescNodes.get(key);
 		if (entry) {
 			const current = (this.plugin.settings as unknown as Record<string, unknown>)[key];
 			const value = typeof current === "string" ? current : "";
 			entry.node.nodeValue = entry.choices.find((c) => c.id === value)?.desc ?? "";
-		}
-		if (key === "personalizeEnabled") {
-			this.syncDomState();
-			this.plugin.notifyPersonalizeChanged();
 		}
 		if (
 			key === "syntaxTableSpacing" ||
@@ -500,12 +494,6 @@ export class OVOSettingTab extends PluginSettingTab {
 		) {
 			this.plugin.refreshChatViews();
 		}
-	}
-
-	/** 就地重算声明式控件的 disabled 谓词（1.13+；旧版本没有该 API） */
-	private syncDomState(): void {
-		const fn = (this as unknown as { refreshDomState?: () => void }).refreshDomState;
-		if (typeof fn === "function") fn.call(this);
 	}
 
 	/* ---------------- 定义辅助 ---------------- */
@@ -580,13 +568,7 @@ export class OVOSettingTab extends PluginSettingTab {
 			name,
 			desc,
 			aliases,
-			control: {
-				type: "dropdown",
-				key,
-				options,
-				// 总开关关闭时档位保留但不可修改
-				disabled: () => !this.plugin.settings.personalizeEnabled,
-			},
+			control: { type: "dropdown", key, options },
 		};
 	}
 
@@ -901,24 +883,17 @@ export class OVOSettingTab extends PluginSettingTab {
 
 	private renderPersonalSection(el: HTMLElement): void {
 		const s = this.plugin.settings;
-		const on = s.personalizeEnabled;
 
-		this.note(
-			el,
-			on
-				? "总开关在对话工具栏「个性化」按键；选「默认」档不注入。"
-				: "个性化已关闭（工具栏「个性化」按键），档位保留但不注入。",
-			on ? undefined : "warn"
-		);
+		this.note(el, "总开关在对话输入区工具栏「个性化」按键；选「默认」档不注入。");
 
-		this.choiceSetting(el, "基本风格和语调", TONE_CHOICES, s.tone, (v) => (s.tone = v), on);
+		this.choiceSetting(el, "基本风格和语调", TONE_CHOICES, s.tone, (v) => (s.tone = v));
 
 		this.heading(el, "表达程度", "gauge", true);
-		this.choiceSetting(el, "亲切程度", WARMTH_CHOICES, s.warmth, (v) => (s.warmth = v), on);
-		this.choiceSetting(el, "热情程度", ENTHUSIASM_CHOICES, s.enthusiasm, (v) => (s.enthusiasm = v), on);
-		this.choiceSetting(el, "表情符号", EMOJI_CHOICES, s.emojiLevel, (v) => (s.emojiLevel = v), on);
+		this.choiceSetting(el, "亲切程度", WARMTH_CHOICES, s.warmth, (v) => (s.warmth = v));
+		this.choiceSetting(el, "热情程度", ENTHUSIASM_CHOICES, s.enthusiasm, (v) => (s.enthusiasm = v));
+		this.choiceSetting(el, "表情符号", EMOJI_CHOICES, s.emojiLevel, (v) => (s.emojiLevel = v));
 
-		this.choiceSetting(el, "布局和视觉元素", LAYOUT_CHOICES, s.layoutStyle, (v) => (s.layoutStyle = v), on);
+		this.choiceSetting(el, "布局和视觉元素", LAYOUT_CHOICES, s.layoutStyle, (v) => (s.layoutStyle = v));
 	}
 
 	/* ================= 高级：键盘发送 ================= */
@@ -938,14 +913,13 @@ export class OVOSettingTab extends PluginSettingTab {
 			});
 	}
 
-	/** 下拉选择（选项自带说明：切换时同步更新设置项说明文字；disabled 用于总开关关闭时置灰） */
+	/** 下拉选择（选项自带说明：切换时同步更新设置项说明文字） */
 	private choiceSetting<T extends string>(
 		el: HTMLElement,
 		name: string,
 		choices: OVOChoice<T>[],
 		value: T,
-		assign: (v: T) => void,
-		disabled = false
+		assign: (v: T) => void
 	): void {
 		const setting = new Setting(el).setName(name);
 		const updateDesc = (id: T) => setting.setDesc(choices.find((c) => c.id === id)?.desc ?? "");
@@ -957,9 +931,7 @@ export class OVOSettingTab extends PluginSettingTab {
 				updateDesc(v as T);
 				await this.plugin.saveSettings();
 			});
-			if (disabled) d.setDisabled(true);
 		});
-		if (disabled) setting.setDisabled(true);
 	}
 
 	/* ================= 提示词：语法增强（按分节调用） ================= */

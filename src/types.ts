@@ -235,7 +235,7 @@ export interface OVOSettings {
 	enabledDrawingTypes: string[];
 
 	/* ---- 个性化（语调 / 程度 / 排版；选「默认」档时不注入） ---- */
-	/** 个性化总开关：关闭后不注入任何风格 / 排版提示词（各档位选择保留） */
+	/** 个性化总开关：由对话输入区工具栏「个性化」按键切换（设置页只提供档位）；关闭后不注入任何风格 / 排版提示词 */
 	personalizeEnabled: boolean;
 	/** 基本风格和语调 */
 	tone: OVOToneId;
