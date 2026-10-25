@@ -67,7 +67,7 @@ export interface OVOAttachment {
 	vaultPath?: string;
 	/** 图片 base64 data URL（data:image/png;base64,...） */
 	dataUrl?: string;
-	/** 文本附件内容 */
+	/** 文本附件内容（仅「当前笔记」附加使用；上传附件只支持图片） */
 	text?: string;
 }
 

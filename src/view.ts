@@ -55,7 +55,6 @@ import { errMsg, isImeComposing } from "./util";
 export const CHAT_VIEW_TYPE = "ovo-chat-view";
 
 const MAX_IMAGE_BYTES = 16 * 1024 * 1024; // 图片上限（官方上限 32MiB，base64 会膨胀，留余量）
-const MAX_TEXT_CHARS = 200_000; // 文本附件上限
 const MAX_TOOL_ROUNDS = 8; // 单轮回复的工具调用循环上限（防死循环）
 
 const EFFORT_LABELS: Record<ThinkingEffort, string> = {
@@ -226,7 +225,7 @@ export class OVOChatView extends ItemView {
 		// 隐藏文件选择器
 		this.fileInput = composer.createEl("input", {
 			type: "file",
-			attr: { multiple: "true", accept: "image/*,.md,.markdown,.txt,.json,.csv,.yaml,.yml,.xml,.html,.css,.js,.ts,.py,.sh,.log" },
+			attr: { multiple: "true", accept: "image/*" },
 		});
 		this.fileInput.hide();
 		this.fileInput.addEventListener("change", () => {
@@ -429,7 +428,7 @@ export class OVOChatView extends ItemView {
 
 	private buildAttachChip(toolbar: HTMLElement): HTMLElement {
 		const attachBtn = toolbar.createEl("button", { cls: "ovo-chip" });
-		attachBtn.setAttribute("aria-label", "上传附件（图片 / Markdown / 文本）");
+		attachBtn.setAttribute("aria-label", "上传图片附件");
 		const clip = attachBtn.createSpan("ovo-chip-icon");
 		setIcon(clip, "paperclip");
 		attachBtn.createSpan({ text: "附件" });
@@ -906,38 +905,27 @@ export class OVOChatView extends ItemView {
 
 	/* ================= 附件 ================= */
 
+	/** 上传附件：仅支持图片，其余文件跳过并提示 */
 	private async addFiles(files: File[]): Promise<void> {
 		for (const f of files) {
 			const isImage = f.type.startsWith("image/") || /\.(png|jpe?g|gif|webp)$/i.test(f.name);
-			if (isImage) {
-				if (f.size > MAX_IMAGE_BYTES) {
-					new Notice(`图片《${f.name}》超过 16MB，已跳过`);
-					continue;
-				}
-				const dataUrl = await readFileAsDataUrl(f);
-				this.pendingAttachments.push({
-					id: genId("a"),
-					name: f.name || "image.png",
-					mime: f.type || "image/png",
-					size: f.size,
-					kind: "image",
-					dataUrl,
-				});
-			} else {
-				let text = await f.text();
-				if (text.length > MAX_TEXT_CHARS) {
-					text = text.slice(0, MAX_TEXT_CHARS);
-					new Notice(`附件《${f.name}》内容过长，已截断至 20 万字符`);
-				}
-				this.pendingAttachments.push({
-					id: genId("a"),
-					name: f.name || "file.txt",
-					mime: f.type || "text/plain",
-					size: f.size,
-					kind: "text",
-					text,
-				});
+			if (!isImage) {
+				new Notice(`仅支持图片附件（PNG / JPG / GIF / WebP），《${f.name}》已跳过`);
+				continue;
 			}
+			if (f.size > MAX_IMAGE_BYTES) {
+				new Notice(`图片《${f.name}》超过 16MB，已跳过`);
+				continue;
+			}
+			const dataUrl = await readFileAsDataUrl(f);
+			this.pendingAttachments.push({
+				id: genId("a"),
+				name: f.name || "image.png",
+				mime: f.type || "image/png",
+				size: f.size,
+				kind: "image",
+				dataUrl,
+			});
 		}
 		this.renderPreview();
 	}

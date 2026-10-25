@@ -27,7 +27,7 @@ const TOOLBAR_BUTTONS: OVOToolbarButtonMeta[] = [
 	{ id: "toolMode", label: "工具", desc: "把内置只读工具交给模型。", icon: "wrench" },
 	{ id: "drawing", label: "绘图", desc: "注入图表语法提示词。", icon: "pie-chart" },
 	{ id: "personalize", label: "个性化", desc: "个性化提示词总开关。", icon: "smile" },
-	{ id: "attach", label: "附件", desc: "上传图片 / 文本附件。", icon: "paperclip" },
+	{ id: "attach", label: "附件", desc: "上传图片附件。", icon: "paperclip" },
 	{ id: "note", label: "当前笔记", desc: "附加当前活动笔记。", icon: "file-text" },
 ];
 
