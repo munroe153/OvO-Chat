@@ -1,6 +1,6 @@
 {
   "name": "ovo-chat",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Custom conversation plugin based on deepseek API.",
   "main": "main.js",
   "scripts": {
